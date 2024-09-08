@@ -28,52 +28,81 @@ function clearElements(tabListElements) {
   });
 }
 
-function createDiscardButton(title, id) {
-  const discardBtn = document.createElement("button");
-  discardBtn.classList.add("discard-btn");
-  discardBtn.classList.add("tab-action-btn");
-  discardBtn.innerText = `Discard tab ${id}`;
+// change the appearance of the "action button" via the appropriate CSS classes
+function toggleActionButtonAppearance(btn) {
+  if (btn.dataset.action === "unload") {
+    if (btn.classList.contains("restore-btn")) {
+      btn.classList.remove("restore-btn");
+    }
 
-  discardBtn.addEventListener("click", function () {
-    console.debug(`Discarding tab with tab id ${id}; title '${title}'`);
+    btn.classList.add("discard-btn");
+    btn.innerText = `Discard tab`;
+    btn.dataset.action = "unload";
+  } else if (btn.dataset.action === "reload") {
+    if (btn.classList.contains("discard-btn")) {
+      btn.classList.remove("discard-btn");
+    }
 
-    browser.tabs.discard(id).then(
-      function () {
-        console.debug(`Discarded tab id: ${id} successfully`);
-      },
-      function (error) {
-        console.error(
-          `Error discarding tab with tab id: ${id} error: ${error}`
-        );
-      }
-    );
-  });
-
-  console.debug(`Added tab with tab id ${id} title: '${title}'`);
-  return discardBtn;
+    btn.classList.add("restore-btn");
+    btn.innerText = `Reload tab`;
+    btn.dataset.action = "reload";
+  }
 }
 
-function createReloadButton(title, id) {
-  const reloadBtn = document.createElement("button");
-  reloadBtn.classList.add("restore-btn");
-  reloadBtn.classList.add("tab-action-btn");
-  reloadBtn.innerText = `Reload tab ${id}`;
-
-  reloadBtn.addEventListener("click", function () {
-    console.debug(`Reloading tab with tab id ${id}; title '${title}'`);
-
-    browser.tabs.reload(id).then(
-      function () {
-        console.debug(`Reloaded tab id: ${id} successfully`);
-      },
-      function (error) {
-        console.error(`Error reloaded tab with tab id: ${id} error: ${error}`);
-      }
+// where actionType = "unload" | "reload"
+function createTabActionButton(title, id, actionType) {
+  // just to ensure callers dont make a mess
+  if (!(actionType === "unload" || actionType === "reload")) {
+    throw new Error(
+      `Action type must be either 'unload' or 'reload' got action type of ${actionType}`
     );
+  }
+
+  const btn = document.createElement("button");
+  btn.classList.add("tab-action-btn");
+  btn.dataset.action = actionType;
+
+  // init class setting
+  toggleActionButtonAppearance(btn);
+
+  btn.addEventListener("click", function () {
+    console.debug(`dataset.action = ${btn.dataset.action}`);
+
+    if (btn.dataset.action === "unload") {
+      console.debug(`Discarding tab with tab id ${id}; title '${title}'`);
+
+      browser.tabs.discard(id).then(
+        function () {
+          console.debug(`Discarded tab id: ${id} successfully`);
+          // unload becomes reload
+          btn.dataset.action = "reload";
+          toggleActionButtonAppearance(btn);
+        },
+        function (error) {
+          console.error(
+            `Error discarding tab with tab id: ${id} error: ${error}`
+          );
+        }
+      );
+    } else if (btn.dataset.action === "reload") {
+      console.debug(`Reloading tab with tab id ${id}; title '${title}'`);
+
+      browser.tabs.reload(id).then(
+        function () {
+          console.debug(`Reloaded tab id: ${id} successfully`);
+          btn.dataset.action = "unload";
+          toggleActionButtonAppearance(btn);
+        },
+        function (error) {
+          console.error(
+            `Error reloading tab with tab id: ${id} error: ${error}`
+          );
+        }
+      );
+    }
   });
 
-  console.debug(`Added tab with tab id ${id} title: '${title}'`);
-  return reloadBtn;
+  return btn;
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -122,10 +151,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // TODO change the button to the opposite buttons after the click event completes successfully
       if (!tab.discarded) {
-        const discardBtn = createDiscardButton(title, id);
+        const discardBtn = createTabActionButton(title, id, "unload");
         tabListElement.appendChild(discardBtn);
       } else {
-        const reloadBtn = createReloadButton(title, id);
+        const reloadBtn = createTabActionButton(title, id, "reload");
         tabListElement.appendChild(reloadBtn);
       }
 
