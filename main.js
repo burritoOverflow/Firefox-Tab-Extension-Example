@@ -11,7 +11,7 @@ function formatClipboardContent(tabArr) {
 function setClipboardContent(content) {
   navigator.clipboard.writeText(content).then(
     function () {
-      console.info(`Copied ${content.length} URLs to clipboard.`);
+      console.info(`Copied content to clipboard.`);
     },
     function (err) {
       console.error(`Got error: ${err} attempting to copy URLs.`);
@@ -110,11 +110,11 @@ document.addEventListener("DOMContentLoaded", function () {
       tabListElement.appendChild(titleSpan);
       tabListElement.appendChild(urlAnchor);
 
+      // TODO change the button to the opposite buttons after the click event completes successfully
       if (!tab.discarded) {
         const discardBtn = createDiscardButton(title, id);
         tabListElement.appendChild(discardBtn);
       } else {
-        // add reload button
         const reloadBtn = createReloadButton(title, id);
         tabListElement.appendChild(reloadBtn);
       }
