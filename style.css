@@ -58,7 +58,7 @@ body {
   color: rgb(124, 48, 239);
 }
 
-#copy-urls {
+#copy-urls-btn {
   background-color: #272727;
   border-radius: 5px;
   border: none;
@@ -72,8 +72,25 @@ body {
   padding: 10px 20px;
 }
 
-.discard-btn {
+.tab-action-btn {
+  border-radius: 6px;
   background-color: #272525;
-  color: rgb(209, 201, 201);
-  font-size: large;
+  font-size: 16px;
+  font-weight: bold;
+  transition-duration: 333ms;
+}
+
+.tab-action-btn:hover {
+  background-color: rgb(62, 58, 58);
+  box-shadow: 5px 9px 5px rgba(18, 17, 17, 0.2);
+  padding: 10px;
+  transform: translateX(5px) translateY(-5px);
+}
+
+.discard-btn {
+  color: rgb(239, 137, 12);
+}
+
+.restore-btn {
+  color: rgb(19, 187, 19);
 }

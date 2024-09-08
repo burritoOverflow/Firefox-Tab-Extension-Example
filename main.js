@@ -11,7 +11,7 @@ function formatClipboardContent(tabArr) {
 function setClipboardContent(content) {
   navigator.clipboard.writeText(content).then(
     function () {
-      console.info(`Copied ${tabContentArr.length} URLs to clipboard.`);
+      console.info(`Copied ${content.length} URLs to clipboard.`);
     },
     function (err) {
       console.error(`Got error: ${err} attempting to copy URLs.`);
@@ -22,20 +22,54 @@ function setClipboardContent(content) {
 function createDiscardButton(title, id) {
   const discardBtn = document.createElement("button");
   discardBtn.classList.add("discard-btn");
+  discardBtn.classList.add("tab-action-btn");
   discardBtn.innerText = `Discard tab ${id}`;
 
   discardBtn.addEventListener("click", function () {
     console.debug(`Discarding tab with tab id ${id}; title '${title}'`);
-    browser.tabs.discard(id);
+
+    browser.tabs.discard(id).then(
+      function () {
+        console.debug(`Discarded tab id: ${id} successfully`);
+      },
+      function (error) {
+        console.error(
+          `Error discarding tab with tab id: ${id} error: ${error}`
+        );
+      }
+    );
   });
 
   console.debug(`Added tab with tab id ${id} title: '${title}'`);
   return discardBtn;
 }
 
+function createReloadButton(title, id) {
+  const reloadBtn = document.createElement("button");
+  reloadBtn.classList.add("restore-btn");
+  reloadBtn.classList.add("tab-action-btn");
+  reloadBtn.innerText = `Reload tab ${id}`;
+
+  reloadBtn.addEventListener("click", function () {
+    console.debug(`Reloading tab with tab id ${id}; title '${title}'`);
+
+    browser.tabs.reload(id).then(
+      function () {
+        console.debug(`Reloaded tab id: ${id} successfully`);
+      },
+      function (error) {
+        console.error(`Error reloaded tab with tab id: ${id} error: ${error}`);
+      }
+    );
+  });
+
+  console.debug(`Added tab with tab id ${id} title: '${title}'`);
+  return reloadBtn;
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   const tabList = document.getElementById("tab-list");
-  const copyBtn = document.getElementById("copy-urls");
+  const copyBtn = document.getElementById("copy-urls-btn");
   const tabCountHeader = document.getElementById("tab-count-header");
 
   const tabContentArr = Array();
@@ -80,9 +114,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const discardBtn = createDiscardButton(title, id);
         tabListElement.appendChild(discardBtn);
       } else {
-        console.debug(
-          `Tab with tab id: ${id} and title ${title} already discarded`
-        );
+        // add reload button
+        const reloadBtn = createReloadButton(title, id);
+        tabListElement.appendChild(reloadBtn);
       }
 
       tabList.appendChild(tabListElement);
