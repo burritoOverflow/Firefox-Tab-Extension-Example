@@ -144,9 +144,16 @@ document.addEventListener("DOMContentLoaded", function () {
     clearElements(tabListElements);
 
     tabListElements.forEach((element) => {
-      if (!element.innerText.toLowerCase().includes(searchStr)) {
-        element.classList.add("hidden");
-        console.debug(`hiding element ${element}`);
+      for (const childElement of element.children) {
+        const tagName = childElement.tagName;
+
+        // avoid filtering the button text
+        if (tagName === "A" || tagName == "SPAN") {
+          if (!childElement.innerText.toLowerCase().includes(searchStr)) {
+            element.classList.add("hidden");
+            console.debug(`hiding element ${element}`);
+          }
+        }
       }
     });
   });
