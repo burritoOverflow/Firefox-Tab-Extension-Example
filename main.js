@@ -19,6 +19,20 @@ function setClipboardContent(content) {
   );
 }
 
+function createDiscardButton(title, id) {
+  const discardBtn = document.createElement("button");
+  discardBtn.classList.add("discard-btn");
+  discardBtn.innerText = `Discard tab ${id}`;
+
+  discardBtn.addEventListener("click", function () {
+    console.debug(`Discarding tab with tab id ${id}; title '${title}'`);
+    browser.tabs.discard(id);
+  });
+
+  console.debug(`Added tab with tab id ${id} title: '${title}'`);
+  return discardBtn;
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   const tabList = document.getElementById("tab-list");
   const copyBtn = document.getElementById("copy-urls");
@@ -32,7 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
     copyBtn.innerText = `Copy ${nTabs} titles and URLs`;
 
     tabs.forEach(function (tab) {
-      const { title, url } = tab;
+      const { title, url, id } = tab;
       tabContentArr.push({
         title,
         url,
@@ -61,6 +75,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
       tabListElement.appendChild(titleSpan);
       tabListElement.appendChild(urlAnchor);
+
+      if (!tab.discarded) {
+        const discardBtn = createDiscardButton(title, id);
+        tabListElement.appendChild(discardBtn);
+      } else {
+        console.debug(
+          `Tab with tab id: ${id} and title ${title} already discarded`
+        );
+      }
 
       tabList.appendChild(tabListElement);
     });

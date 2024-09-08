@@ -71,3 +71,9 @@ body {
   margin: 0 auto;
   padding: 10px 20px;
 }
+
+.discard-btn {
+  background-color: #272525;
+  color: rgb(209, 201, 201);
+  font-size: large;
+}
