@@ -19,6 +19,15 @@ function setClipboardContent(content) {
   );
 }
 
+// restore all elements to the DOM
+function clearElements(tabListElements) {
+  tabListElements.forEach((element) => {
+    if (element.classList.contains("hidden")) {
+      element.classList.remove("hidden");
+    }
+  });
+}
+
 function createDiscardButton(title, id) {
   const discardBtn = document.createElement("button");
   discardBtn.classList.add("discard-btn");
@@ -73,6 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const tabCountHeader = document.getElementById("tab-count-header");
 
   const tabContentArr = Array();
+  const tabListElements = Array();
 
   browser.tabs.query({ currentWindow: true }, function (tabs) {
     const nTabs = tabs.length;
@@ -120,6 +130,24 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       tabList.appendChild(tabListElement);
+      tabListElements.push(tabListElement);
+    });
+  });
+
+  const searchElement = document.getElementById("search");
+
+  // certainly, this is far too slow
+  searchElement.addEventListener("input", function (event) {
+    const searchStr = event.target.value.toLowerCase();
+
+    // restore all elements on each input change....
+    clearElements(tabListElements);
+
+    tabListElements.forEach((element) => {
+      if (!element.innerText.toLowerCase().includes(searchStr)) {
+        element.classList.add("hidden");
+        console.debug(`hiding element ${element}`);
+      }
     });
   });
 

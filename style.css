@@ -7,10 +7,22 @@ body {
   width: 600px;
 }
 
+#search {
+  border: 1px solid black;
+  display: block;
+  font-size: larger;
+  height: 10%;
+  line-height: 1;
+  margin: 0 auto;
+  padding: 10px;
+  /* width: 55%; */
+}
+
 #tab-list {
   list-style: decimal-leading-zero;
   border: 1px solid gray;
   margin: 0;
+  margin-top: 1em;
   padding: 0;
   text-align: center;
 }
@@ -22,6 +34,7 @@ body {
   color: black;
   display: inline-block;
   margin: 0 5px;
+  margin-bottom: 1em;
   overflow: hidden;
   padding-bottom: 0.33em;
   padding-left: 0.33em;
@@ -68,15 +81,18 @@ body {
   display: block;
   font-size: large;
   font-weight: 700;
+  margin-top: 55px;
   margin: 0 auto;
   padding: 10px 20px;
 }
 
 .tab-action-btn {
-  border-radius: 6px;
   background-color: #272525;
+  border-radius: 6px;
   font-size: 16px;
   font-weight: bold;
+  margin-top: 1em;
+  padding: 7px;
   transition-duration: 333ms;
 }
 
@@ -93,4 +109,8 @@ body {
 
 .restore-btn {
   color: rgb(19, 187, 19);
+}
+
+.hidden {
+  display: none !important;
 }
