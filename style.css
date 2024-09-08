@@ -1,0 +1,73 @@
+body {
+  margin-left: 2.5em;
+  margin-right: 2.5em;
+  font-size: 16px;
+  font-weight: bold;
+  height: 400px;
+  width: 600px;
+}
+
+#tab-list {
+  list-style: decimal-leading-zero;
+  border: 1px solid gray;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+#tab-list > li {
+  background-color: rgb(229, 221, 221);
+  border-radius: 5px;
+  border: 1px solid black;
+  color: black;
+  display: inline-block;
+  margin: 0 5px;
+  overflow: hidden;
+  padding-bottom: 0.33em;
+  padding-left: 0.33em;
+  padding-top: 0.55em;
+  transition-duration: 123ms;
+  width: 75%;
+}
+
+#tab-list > li:hover {
+  background-color: white;
+  box-shadow: 12px 7px 10px rgba(87, 84, 84, 0.5);
+  transform: translate(7px, -9px);
+}
+
+.tab-title {
+  color: #272525;
+  font-size: x-large;
+  font-weight: bold;
+}
+
+.tab-url {
+  font-size: x-large;
+  font-weight: 300;
+  text-decoration-color: #272525;
+  text-decoration: underline;
+}
+
+.tab-url:link {
+  color: rgb(32, 32, 228);
+  font-weight: 500;
+}
+
+.tab-url:visited {
+  color: rgb(124, 48, 239);
+}
+
+#copy-urls {
+  background-color: #272727;
+  border-radius: 5px;
+  border: none;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+  color: #fff;
+  cursor: pointer;
+  display: block;
+  font-size: large;
+  font-weight: 700;
+  margin: 0 auto;
+  padding: 10px 20px;
+}
