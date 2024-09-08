@@ -174,11 +174,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // TODO change the button to the opposite buttons after the click event completes successfully
       if (!tab.discarded) {
-        const discardBtn = createTabActionButton(title, id, "unload");
-        tabListElement.appendChild(discardBtn);
+        tabListElement.appendChild(createTabActionButton(title, id, "unload"));
       } else {
-        const reloadBtn = createTabActionButton(title, id, "reload");
-        tabListElement.appendChild(reloadBtn);
+        tabListElement.appendChild(createTabActionButton(title, id, "reload"));
       }
 
       tabList.appendChild(tabListElement);
@@ -187,6 +185,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   const searchElement = document.getElementById("search");
+  let nSearchMatches = 0;
 
   // certainly, this is far too slow
   searchElement.addEventListener("input", function (event) {
@@ -194,20 +193,38 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // restore all elements on each input change....
     clearElements(tabListElements);
+    nSearchMatches = 0;
 
-    tabListElements.forEach((element) => {
+    const elementResults = tabListElements.map((element) => {
+      const m = {
+        element: element,
+        titleStr: "",
+        urlStr: "",
+      };
+
       for (const childElement of element.children) {
         // TODO this search misses quite a few elements..
-        if (
-          childElement.classList.contains("tab-title") ||
-          childElement.classList.contains("tab-url")
-        ) {
-          console.debug(childElement.innerText);
-
-          if (!childElement.innerText.toLowerCase().includes(searchStr)) {
-            element.classList.add("hidden");
-          }
+        if (childElement.classList.contains("tab-title")) {
+          m.titleStr = childElement.innerText.toLowerCase();
         }
+
+        if (childElement.classList.contains("tab-url")) {
+          m.urlStr = childElement.innerText.toLowerCase();
+        }
+      }
+
+      return m;
+    });
+
+    elementResults.forEach((element) => {
+      const hasSearch =
+        element.titleStr.includes(searchStr) ||
+        element.urlStr.includes(searchStr);
+
+      if (!hasSearch) {
+        element.element.classList.add("hidden");
+      } else {
+        nSearchMatches++;
       }
     });
   });
