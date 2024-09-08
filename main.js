@@ -71,8 +71,10 @@ function createTabActionButton(title, id, actionType) {
     if (btn.dataset.action === "unload") {
       console.debug(`Discarding tab with tab id ${id}; title '${title}'`);
 
+      // TOOD: this wont work on the currently active tab
       browser.tabs.discard(id).then(
         function () {
+          // this is called even when the tab is the current/focused tab
           console.debug(`Discarded tab id: ${id} successfully`);
           // unload becomes reload
           btn.dataset.action = "reload";
@@ -117,6 +119,17 @@ function onCloseTabClick(id, li) {
 
   // close the tab and remove the parent element
   browser.tabs.remove(id).then(onRemoved, onError);
+}
+
+// TODO: keep in mind this wont change the state of a button for this tab if that tab was discarded
+function onActiveTabClick(id) {
+  function onActive() {
+    console.debug(`Made tab with id: ${id} active`);
+  }
+  function onError(error) {
+    console.error(`Error making tab with id: ${id} active; error: ${error}`);
+  }
+  browser.tabs.update(id, { active: true }).then(onActive, onError);
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -170,7 +183,15 @@ document.addEventListener("DOMContentLoaded", function () {
         onCloseTabClick(id, tabListElement);
       });
 
+      const activeButton = document.createElement("button");
+      activeButton.textContent = "Go to Tab";
+      activeButton.classList.add("active-button");
+      activeButton.addEventListener("click", function () {
+        onActiveTabClick(id);
+      });
+
       tabListElement.appendChild(closeButton);
+      tabListElement.appendChild(activeButton);
 
       // TODO change the button to the opposite buttons after the click event completes successfully
       if (!tab.discarded) {

@@ -38,7 +38,7 @@ body {
   overflow: hidden;
   padding-bottom: 0.33em;
   padding-left: 0.33em;
-  padding-top: 1.11em;
+  padding-top: 1.78em;
   position: relative;
   transition-duration: 123ms;
   width: 80%;
@@ -55,6 +55,21 @@ body {
   font-weight: 600;
   position: absolute;
   right: 5px;
+  text-align: center;
+  top: 5px;
+}
+
+.active-button {
+  background-color: black;
+  border-radius: 20%;
+  border: 1px solid black;
+  box-shadow: 5px 7px 8px rgba(67, 64, 64, 0.5);
+  color: rgb(53, 207, 26);
+  cursor: pointer;
+  font-size: large;
+  font-weight: 600;
+  position: absolute;
+  right: 35px;
   text-align: center;
   top: 5px;
 }
