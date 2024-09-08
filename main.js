@@ -41,6 +41,49 @@ function clearElements(tabListElements) {
   });
 }
 
+function addTabListInfoElements(title, url, tabListElement) {
+  const titleSpan = document.createElement("span");
+  titleSpan.textContent = `Title: ${title} `;
+  titleSpan.classList.add("tab-title");
+
+  // click on link element saves just the url from the link
+  const urlAnchor = document.createElement("a");
+  urlAnchor.style.display = "block";
+  urlAnchor.style.paddingTop = "2.5%";
+
+  urlAnchor.textContent = `URL: ${url}`;
+  urlAnchor.classList.add("tab-url");
+
+  urlAnchor.setAttribute("href", url);
+
+  urlAnchor.addEventListener("click", function (e) {
+    e.preventDefault();
+    setClipboardContent(url);
+  });
+
+  tabListElement.appendChild(titleSpan);
+  tabListElement.appendChild(urlAnchor);
+}
+
+function addActionButtons(id, tabListElement) {
+  const closeButton = document.createElement("button");
+  closeButton.textContent = "X";
+  closeButton.classList.add("close-button");
+  closeButton.addEventListener("click", function () {
+    onCloseTabClick(id, tabListElement);
+  });
+
+  const activeButton = document.createElement("button");
+  activeButton.textContent = "Go to Tab";
+  activeButton.classList.add("active-button");
+  activeButton.addEventListener("click", function () {
+    onActiveTabClick(id);
+  });
+
+  tabListElement.appendChild(closeButton);
+  tabListElement.appendChild(activeButton);
+}
+
 // change the appearance of the "action button" via the appropriate CSS classes
 function toggleActionButtonAppearance(btn) {
   if (btn.dataset.action === "unload") {
@@ -160,7 +203,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const copyBtn = document.getElementById("copy-urls-btn");
   const tabCountHeader = document.getElementById("tab-count-header");
 
+  // collect attributes associated with each tab
   const tabContentArr = Array();
+  // retain refs for each created `li` element for each tab
   const tabListElements = Array();
 
   browser.tabs.query({ currentWindow: true }, function (tabs) {
@@ -176,47 +221,9 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
       const tabListElement = document.createElement("li");
+      addTabListInfoElements(title, url, tabListElement);
+      addActionButtons(id, tabListElement);
 
-      const titleSpan = document.createElement("span");
-      titleSpan.textContent = `Title: ${title} `;
-      titleSpan.classList.add("tab-title");
-
-      // click on link element saves just the url from the link
-      const urlAnchor = document.createElement("a");
-      urlAnchor.style.display = "block";
-      urlAnchor.style.paddingTop = "2.5%";
-
-      urlAnchor.textContent = `URL: ${url}`;
-      urlAnchor.classList.add("tab-url");
-
-      urlAnchor.setAttribute("href", url);
-
-      urlAnchor.addEventListener("click", function (e) {
-        e.preventDefault();
-        setClipboardContent(url);
-      });
-
-      tabListElement.appendChild(titleSpan);
-      tabListElement.appendChild(urlAnchor);
-
-      const closeButton = document.createElement("button");
-      closeButton.textContent = "X";
-      closeButton.classList.add("close-button");
-      closeButton.addEventListener("click", function () {
-        onCloseTabClick(id, tabListElement);
-      });
-
-      const activeButton = document.createElement("button");
-      activeButton.textContent = "Go to Tab";
-      activeButton.classList.add("active-button");
-      activeButton.addEventListener("click", function () {
-        onActiveTabClick(id);
-      });
-
-      tabListElement.appendChild(closeButton);
-      tabListElement.appendChild(activeButton);
-
-      // TODO change the button to the opposite buttons after the click event completes successfully
       if (!tab.discarded) {
         tabListElement.appendChild(createTabActionButton(title, id, "unload"));
       } else {
@@ -247,7 +254,6 @@ document.addEventListener("DOMContentLoaded", function () {
       };
 
       for (const childElement of element.children) {
-        // TODO this search misses quite a few elements..
         if (childElement.classList.contains("tab-title")) {
           m.titleStr = childElement.innerText.toLowerCase();
         }
