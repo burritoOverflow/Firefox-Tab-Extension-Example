@@ -105,6 +105,20 @@ function createTabActionButton(title, id, actionType) {
   return btn;
 }
 
+function onCloseTabClick(id, li) {
+  function onRemoved() {
+    console.debug(`Removed tab with id: ${id}`);
+    li.remove();
+  }
+
+  function onError(error) {
+    console.error(`Error removing tab with id ${id}; error: ${error}`);
+  }
+
+  // close the tab and remove the parent element
+  browser.tabs.remove(id).then(onRemoved, onError);
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   const tabList = document.getElementById("tab-list");
   const copyBtn = document.getElementById("copy-urls-btn");
@@ -149,6 +163,15 @@ document.addEventListener("DOMContentLoaded", function () {
       tabListElement.appendChild(titleSpan);
       tabListElement.appendChild(urlAnchor);
 
+      const closeButton = document.createElement("button");
+      closeButton.textContent = "X";
+      closeButton.classList.add("close-button");
+      closeButton.addEventListener("click", function () {
+        onCloseTabClick(id, tabListElement);
+      });
+
+      tabListElement.appendChild(closeButton);
+
       // TODO change the button to the opposite buttons after the click event completes successfully
       if (!tab.discarded) {
         const discardBtn = createTabActionButton(title, id, "unload");
@@ -174,13 +197,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     tabListElements.forEach((element) => {
       for (const childElement of element.children) {
-        const tagName = childElement.tagName;
+        // TODO this search misses quite a few elements..
+        if (
+          childElement.classList.contains("tab-title") ||
+          childElement.classList.contains("tab-url")
+        ) {
+          console.debug(childElement.innerText);
 
-        // avoid filtering the button text
-        if (tagName === "A" || tagName == "SPAN") {
           if (!childElement.innerText.toLowerCase().includes(searchStr)) {
             element.classList.add("hidden");
-            console.debug(`hiding element ${element}`);
           }
         }
       }
