@@ -19,6 +19,19 @@ function setClipboardContent(content) {
   );
 }
 
+function isTabActive(id, callback) {
+  browser.windows
+    .getCurrent({ populate: true })
+    .then((windowInfo) => {
+      const activeTab = windowInfo.tabs.find((tab) => tab.active);
+      callback(activeTab && activeTab.id === id);
+    })
+    .catch((error) => {
+      console.error(`Error checking active tab: ${error}`);
+      callback(false);
+    });
+}
+
 // restore all elements to the DOM
 function clearElements(tabListElements) {
   tabListElements.forEach((element) => {
@@ -69,23 +82,33 @@ function createTabActionButton(title, id, actionType) {
     console.debug(`dataset.action = ${btn.dataset.action}`);
 
     if (btn.dataset.action === "unload") {
-      console.debug(`Discarding tab with tab id ${id}; title '${title}'`);
+      isTabActive(id, function (isActive) {
+        // TODO we'll just ignore for the currently active tab, for now.
+        // the 'success' callback is invoked but currently accessed tab will not be discarded
+        if (isActive) {
+          console.debug(`Tab id: ${id} is active tab; not discarding`);
+          return;
+        } else {
+          console.debug(
+            `Tab is not active - discarding tab with tab id ${id}; title '${title}'`
+          );
 
-      // TOOD: this wont work on the currently active tab
-      browser.tabs.discard(id).then(
-        function () {
-          // this is called even when the tab is the current/focused tab
-          console.debug(`Discarded tab id: ${id} successfully`);
-          // unload becomes reload
-          btn.dataset.action = "reload";
-          toggleActionButtonAppearance(btn);
-        },
-        function (error) {
-          console.error(
-            `Error discarding tab with tab id: ${id} error: ${error}`
+          browser.tabs.discard(id).then(
+            function () {
+              // this is called even when the tab is the current/focused tab
+              console.debug(`Discarded tab id: ${id} successfully`);
+              // unload becomes reload
+              btn.dataset.action = "reload";
+              toggleActionButtonAppearance(btn);
+            },
+            function (error) {
+              console.error(
+                `Error discarding tab with tab id: ${id} error: ${error}`
+              );
+            }
           );
         }
-      );
+      });
     } else if (btn.dataset.action === "reload") {
       console.debug(`Reloading tab with tab id ${id}; title '${title}'`);
 
