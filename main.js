@@ -1,3 +1,36 @@
+// TOOD create a new list element when a tab is created + remove when removed
+function handleTabChangedMessage(request, sender, response) {
+  console.debug("Got request: " + JSON.stringify(request));
+
+  if (request.message == "tab-removed") {
+    // find tab with ID
+    const { tabId } = request;
+    const elementQuery = document.querySelector(`[data-tabid="${tabId}"]`);
+    if (elementQuery) {
+      onCloseTabClick(tabId, elementQuery[0]);
+    }
+  } else if (request.message == "tab-added") {
+  }
+}
+
+function createTabListItem(tab) {
+  const { title, url, id } = tab;
+
+  const tabListElement = document.createElement("li");
+  tabListElement.dataset.tabid = id;
+
+  addTabListInfoElements(title, url, tabListElement);
+  addActionButtons(id, tabListElement);
+
+  if (!tab.discarded) {
+    tabListElement.appendChild(createTabActionButton(title, id, "unload"));
+  } else {
+    tabListElement.appendChild(createTabActionButton(title, id, "reload"));
+  }
+
+  return tabListElement;
+}
+
 function formatClipboardContent(tabArr) {
   let fmtString = String();
 
@@ -173,6 +206,8 @@ function createTabActionButton(title, id, actionType) {
   return btn;
 }
 
+// @param id - the tabID
+// @param li - the list element to remove
 function onCloseTabClick(id, li) {
   function onRemoved() {
     console.debug(`Removed tab with id: ${id}`);
@@ -199,6 +234,8 @@ function onActiveTabClick(id) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+  browser.runtime.onMessage.addListener(handleTabChangedMessage);
+
   const tabList = document.getElementById("tab-list");
   const copyBtn = document.getElementById("copy-urls-btn");
   const tabCountHeader = document.getElementById("tab-count-header");
@@ -220,16 +257,7 @@ document.addEventListener("DOMContentLoaded", function () {
         url,
       });
 
-      const tabListElement = document.createElement("li");
-      addTabListInfoElements(title, url, tabListElement);
-      addActionButtons(id, tabListElement);
-
-      if (!tab.discarded) {
-        tabListElement.appendChild(createTabActionButton(title, id, "unload"));
-      } else {
-        tabListElement.appendChild(createTabActionButton(title, id, "reload"));
-      }
-
+      const tabListElement = createTabListItem(tab, tabList);
       tabList.appendChild(tabListElement);
       tabListElements.push(tabListElement);
     });
